@@ -345,7 +345,7 @@ pair<int, int> tuki(vector<vector<char>> &maze, int i, int j, int a, int b) {
 }
 
 int main() {
-
+    
     int test_cases_number;
     int n;
     int m;
@@ -364,10 +364,10 @@ int main() {
                 cin >> maze[j][k];
             }
         }
-
+        
         // 1era solución, arrancando desde "arriba" de {0, 0}
         pair<int,int> solParc1 = tuki(maze, 0, 0, -1, 0);
-
+    
         // 2da solución, arrancando desde la "izquierda" de {0, 0}
         pair<int,int> solParc2 = tuki(maze, 0, 0, 0, -1);
 
