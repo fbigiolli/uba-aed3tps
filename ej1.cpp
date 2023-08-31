@@ -346,36 +346,45 @@ pair<int, int> tuki(vector<vector<char>> &maze, int i, int j, int a, int b) {
 
 int main() {
     
-    vector<vector<char>> maze1 = {{'I', 'L', 'I'},
-                                 {'#', 'I', 'L'},
-                                 {'+', 'L', '+'}};
+    int test_cases_number;
+    int n;
+    int m;
+    vector<vector<char>> maze;
 
-    vector<vector<char>> maze2 = {{'L', 'I', '+', 'L'},
-                                  {'+', '+', 'I', 'L'},
-                                  {'I', '#', '+', '#'},
-                                  {'L', 'I', '+', '+'}};
+    cin >> test_cases_number;
 
-    vector<vector<char>> maze3 = {{'+', '#'},
-                                  {'#', 'L'}};
+    for(int i = 0; i < test_cases_number; i++) {
+        cin >> n;
+        cin >> m;
 
-    // 1era solución, arrancando desde "arriba" de {0, 0}
-    pair<int,int> solParc1 = tuki(maze2, 0, 0, -1, 0);
+        vector<vector<char>> maze(n, vector<char>(m, 'a'));
+
+        for (int j = 0; j < n; j++) {
+            for(int k = 0; k < m; k++) {
+                cin >> maze[j][k];
+            }
+        }
+        
+        // 1era solución, arrancando desde "arriba" de {0, 0}
+        pair<int,int> solParc1 = tuki(maze, 0, 0, -1, 0);
     
-    // 2da solución, arrancando desde la "izquierda" de {0, 0}
-    pair<int,int> solParc2 = tuki(maze2, 0, 0, 0, -1);
+        // 2da solución, arrancando desde la "izquierda" de {0, 0}
+        pair<int,int> solParc2 = tuki(maze, 0, 0, 0, -1);
 
-    pair<int,int> sol = {
-        max(solParc1.first, solParc2.first),
+        pair<int,int> sol = {
+            max(solParc1.first, solParc2.first),
 
-        min(solParc1.second, solParc2.second)
-    };
-   
-    // Se pone el rango de 120 porque por precondicion sabemos que la matriz no pasa ese numero de casillas
-    if(NINF < sol.first < NINF + 120 || INF - 120 > sol.second > INF) 
-        cout << "IMPOSIBLE" << endl;    
-    else {
-        cout << "POSIBLE" << endl;
-        cout << sol.first << " " << sol.second << endl;
+            min(solParc1.second, solParc2.second)
+        };
+    
+        // Se pone el rango de 120 porque por precondicion sabemos que la matriz no pasa ese numero de casillas
+        if(NINF - 120 <= sol.first < NINF + 120 || INF - 120 <= sol.second < INF + 120)
+            cout << "IMPOSIBLE" << endl;    
+        else {
+            cout << "POSIBLE" << endl;
+            cout << sol.first << " " << sol.second << endl;
+        }
+
     }
+    
 }
-
