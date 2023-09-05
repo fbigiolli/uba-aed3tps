@@ -5,52 +5,38 @@ using namespace std;
 
 bool encontrado = false;
 
-/*
-           
-500 700        -200
-
-*/
-bool afip(vector<int>& libro, vector<char>& signos, int index, int balanceFinal) {
+void afip(vector<int>& libro, vector<char>& signos, int index, int balanceFinal) {
     // Caso base
-    if (index == libro.size())
-    {
-        if (balanceFinal == 0)
-        {
-            for(char c:signos){
+    if (index == libro.size()) {
+        if (balanceFinal == 0) {
+            for(char c : signos){
                 cout << c;
             }
             encontrado = true;
             cout << endl;
-            return true;
         }
-        
-        else
-        {
-            return false;
-        }
-        
+        return; 
     }
 
-    // Recursion usando el signo ? para el actual
+    // Recursión usando el signo ? para el actual
     signos.push_back('?');
-    bool pregunta=afip(libro, signos, index + 1, balanceFinal);
+    afip(libro, signos, index + 1, balanceFinal);
     signos.pop_back();
     
-    if(!encontrado) {
-    // Recursion usando el signo + para el actual
-    signos.push_back('+');
-    bool suma=afip(libro, signos, index + 1, balanceFinal - libro[index]);
-    signos.pop_back();
+    if (!encontrado) {
+        // Recursión usando el signo + para el actual
+        signos.push_back('+');
+        afip(libro, signos, index + 1, balanceFinal - libro[index]);
+        signos.pop_back();
 
-    // Recursion usando el signo - para el actual
-    signos.push_back('-');
-    bool resta=afip(libro, signos, index + 1, balanceFinal + libro[index]);
-    signos.pop_back();
+        // Recursión usando el signo - para el actual
+        signos.push_back('-');
+        afip(libro, signos, index + 1, balanceFinal + libro[index]);
+        signos.pop_back();
 
-    return false;
     }
-
 }
+
 
 
 int main() {
@@ -72,9 +58,10 @@ int main() {
             cin >> libro[i];
         }
         
-        bool booleano= afip(libro, signos, 0, balanceFinal);
+        afip(libro, signos, 0, balanceFinal);
 
         encontrado = false;
             
     }
+    return 0;
 }
