@@ -1,11 +1,11 @@
-
 #include <iostream>
 #include <vector>
 
 using namespace std;
 
-vector<char> res = {};
+int balanceFinalEsperado;
 
+// Funcion para calcular el size que va a requerir la matriz.
 int sumaElementos(vector<int>& s) {
     int suma = 0;
     for(int i = 0; i < s.size(); i++) {
@@ -14,104 +14,78 @@ int sumaElementos(vector<int>& s) {
     return suma;
 }
 
- /*
-
- 2 -200
-500 700
-
-       -1200  -1100 -1000  -900  -800  -700  -600  -500  -400  -300 -200  -100  0  100  200  300  400  500  600  700  800  900  1000  1100  1200
-        
- 0                            F                        T                                                 T   
- --------------------------------------------------------------------------------------------------------------------------------------------------------
- 1        T                                                            T                  T                                                    T                             
----------------------------------------------------------------------------------------------------------------------------------------------------------
-
-4 
-5 7 7 1 
-
-       -20 -19 -18 -17 -16 -15 -14 -13 -12 -11 -10 -9 -8 -7 -6 -5 -4 -3 -2 -1 0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17  18  19  20
-        
- 0                                                              T                            T                     
----------------------------------------------------------------------------------------------------------------------------------------------------------
- 1                                      T                                T           T                               T                                                         
----------------------------------------------------------------------------------------------------------------------------------------------------------
- 2          T                                      T             T                           T           T                                      T
--------------------------------------------------------------------------------------------------------------------------------------------------------- 
- 3     T       T                                T     T      T      T                     T     T      T    T                                T        T            
---------------------------------------------------------------------------------------------------------------------------------------------------------  
+/*                            
+            0 0 1 0 0 0 1 0 0 
+            0 1 0 1 0 1 0 1 0  
+            1 0 1 0 1 0 1 0 1
 */
 
+bool sePuede(vector<int>& libro, vector<vector<bool>>& m, vector<char>& signos, int index, int balanceActual) {
 
+    // "Cortafuegos" para no salir de rango de la matriz
+    if (balanceActual > m[0].size() - 1 || balanceActual < 0){
+        return false;
+    }
+    
+    // Caso base, llegamos al final de la matriz, o sea, recorrimos todo el libro
+    if(index == m.size() - 1) {
+        return balanceActual == balanceFinalEsperado && m[index][balanceActual];
+    } else if(m[index][balanceActual]) {
 
-void reconstruirRecPositiva(vector<int>& libro, vector<char>& signos, vector<vector<bool>>& m, int index, int balanceFinal)
-{
-    int offset =  m[0].size()/2 ;
+        bool suma = sePuede(libro, m, index + 1, balanceActual + libro[index + 1]);
 
-    if(index == libro.size() - 1) {
-        if(m[index][balanceFinal] == 0)
-        {
-            res = signos;
+        bool resta = sePuede(libro, m, index + 1, balanceActual - libro[index + 1]);
+
+        return suma || resta;
+
+    }
+    return false;
+}
+
+void afip(vector<int>& libro, vector<char>& signos, int index, int balanceFinal) {
+    // Caso base
+    if (index == libro.size()) {
+        if (balanceFinal == 0) {
+            for(char c : signos){
+                cout << c;
+            }
+            encontrado = true;
+            cout << endl;
         }
-        return;
-    } 
+        return; 
+    }
 
-    else if (balanceFinal <= (m[0].size() / 2)){
-        // Recursión signo +
-        if (m[index + 1][balanceFinal + libro[index]+offset])
-        {
-            signos.push_back('+');
-            reconstruirRecPositiva(libro, signos, m, index + 1, balanceFinal + libro[index]);
-            signos.pop_back();
-        }
-        
-        else if (m[index + 1][balanceFinal - libro[index]]+offset)
-        {
-            signos.push_back('-');
-            reconstruirRecPositiva(libro, signos, m, index + 1, balanceFinal - libro[index]);
-            signos.pop_back();
-        }
+    // Recursión usando el signo ? para el actual
+    signos.push_back('?');
+    afip(libro, signos, index + 1, balanceFinal);
+    signos.pop_back();
+    
+    if (!encontrado) {
+        // Recursión usando el signo + para el actual
+        signos.push_back('+');
+        afip(libro, signos, index + 1, balanceFinal - libro[index]);
+        signos.pop_back();
+
+        // Recursión usando el signo - para el actual
+        signos.push_back('-');
+        afip(libro, signos, index + 1, balanceFinal + libro[index]);
+        signos.pop_back();
+
     }
 }
 
-void reconstruir(vector<int>& libro, vector<char>& signos, vector<vector<bool>>& m, int index, int balanceFinal) {
-   
-    int offset =  m[0].size()/2 ;
-    
-    for (int i = libro.size() - 1; i > 0; i--) {
-
-            bool valorResta = m[i - 1][balanceFinal - libro[i] + offset];
-            bool valorSuma = m[i - 1][balanceFinal + libro[i]  + offset];
-
-            if (valorResta && valorSuma) {
-                signos[i] = '?';
-                balanceFinal-=libro[i];
-
-            } else if (valorResta) {
-                signos[i] = '+';
-                balanceFinal-=libro[i];
-            }
-
-            else {
-                signos[i] = '-';
-                balanceFinal+=libro[i];
-            }
-
-        }
-        
-        if(libro[0] > 0) {
-            signos[0] = '+';
-        } else
-            signos[0] = '-';
-}
 
 
 void afip(vector<int>& libro, vector<char>& signos, vector<vector<bool>>& m, int index, int balanceFinal) {
     
+    // Calcular el offset para encontrar la posicion en la que nuestro balance es 0
     int offset =  m[0].size()/2;
     
+    // Setear las dos primeras posibilidades
     m[0][offset + libro[0]] = true;
     m[0][offset - libro[0]] = true;
 
+    // Construir la matriz con todos los posibles caminos
     for (int i = 1; i < libro.size(); i++)
         {
             for (int j = 0; j < m[0].size() ; j++)
@@ -132,6 +106,7 @@ void afip(vector<int>& libro, vector<char>& signos, vector<vector<bool>>& m, int
             }
         }
 
+        // Print para testear la matriz
         for(int i = 0; i < m.size(); i++) {
             for(int j = 0; j < m[0].size(); j++) {
                 cout << m[i][j] << " ";
@@ -139,7 +114,69 @@ void afip(vector<int>& libro, vector<char>& signos, vector<vector<bool>>& m, int
         cout << endl;
         }
 
-    reconstruirRecPositiva(libro, signos, m, 0, libro[0]);
+    
+        // Calcular para la primer posicion si existe un camino posible
+
+        bool suma = sePuede(libro, m, 0,  libro[0] + offset);
+        bool resta = sePuede(libro, m, 0, - libro[0] + offset);
+
+        int balanceAcumuladoSuma = 0;
+        int balanceAcumuladoResta = 0;
+
+        if(suma && resta)
+            signos[0] = '?';
+
+        else if(suma)
+            signos[0] = '+';
+
+        else
+            signos[0] = '-';
+
+        bool sumaSuma;
+        bool sumaResta;
+        bool restaSuma;
+        bool restaResta;
+
+        for(int i = 1; i < libro.size(); i++) {
+
+            if (suma)
+            {
+                balanceAcumuladoSuma += libro[i-1];
+
+                bool sumaSuma = sePuede(libro, m, i, balanceAcumuladoSuma + libro[i] + offset);
+
+                bool sumaResta = sePuede(libro, m, i, balanceAcumuladoSuma - libro[i] + offset);
+            }
+
+            if (resta)
+            {
+                balanceAcumuladoResta -= libro[i - 1];
+
+                bool restaSuma = sePuede(libro, m, i, balanceAcumuladoResta + libro[i] + offset);
+
+                bool restaResta = sePuede(libro, m, i, balanceAcumuladoResta - libro[i] + offset);
+
+            }
+            
+            suma = sumaSuma || sumaResta;
+            resta = restaSuma || restaResta;
+/*                            
+            0 0 1 0 0 0 1 0 0 
+            0 1 0 1 0 1 0 1 0  
+            1 0 1 0 1 0 1 0 1
+*/
+
+            if(suma && resta)
+                signos[i] = '?';
+
+            else if(suma)
+                signos[i] = '+';
+
+            else
+                signos[i] = '-';
+
+        }
+
 }
 
 int main() {
@@ -166,6 +203,10 @@ int main() {
         int sizeMatriz = sumaElementos(libro);
         
         vector<vector<bool>> m(n, vector<bool>(2 * sizeMatriz + 1, false));
+
+        int offset =  m[0].size()/2;
+
+        balanceFinalEsperado = balanceFinal + offset;
         
         afip(libro, signos, m, 0, balanceFinal);
 
@@ -175,8 +216,8 @@ int main() {
             cout << signos[i];
         }
 
+        cout << endl;
 
-        cout << endl;  
     }
     return 0;
 }
