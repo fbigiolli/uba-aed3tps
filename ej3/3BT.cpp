@@ -13,9 +13,23 @@ int sumaRestantes(vector<int>& libro, int index, int ignorarElem) {
     return suma;
 }
 
+/*
+
+
+400
+    500  700  100  700 
+
+    1             5    7
+    ------------------------------------------
+ +  f              t    t
+    ------------------------------------------
+ -  t            f    t
+
+*/
+
 bool sePuede(vector<int>& libro, int index, int ignorarElem, int balanceFinal) {
 
-    // Caso base, ya llené consideré todos los elementos
+    // Caso base, ya consideré todos los elementos
     if(index == libro.size()) {
         if(balanceFinal == 0)
             return true;
@@ -24,8 +38,14 @@ bool sePuede(vector<int>& libro, int index, int ignorarElem, int balanceFinal) {
 
     } else {
 
+        int sumaRest = sumaRestantes(libro, index, ignorarElem);
+
+        if((balanceFinal > 0 && sumaRest < balanceFinal) || (balanceFinal < 0 && -sumaRest > balanceFinal))
+            return false;
+
         bool suma;
         bool resta;
+
         if (index != ignorarElem) {
 
             suma = sePuede(libro, index + 1, ignorarElem, balanceFinal - libro[index]);
@@ -46,12 +66,29 @@ void afip(vector<int>& libro, vector<char>& signos, int balanceFinal) {
 
     int balance = balanceFinal;
 
+    // Buscar el maximo elemento para determinar el size de la matriz
+    int max = 0;
+    for(int i = 0; i < libro.size(); i++) {
+        if(libro[i] > max)
+            max = libro[i];
+    }
+
+    // La primer fila de memo representa la suma, la segunda la resta de ese numero
+    vector<vector<int>> memo (2, vector<int>(max + 1, -1));
+
     for(int i = 0; i < libro.size(); i++) {
 
-            bool suma = sePuede(libro, 0, i, balance - libro[i]);
+            // Si en memo no tenemos precalculado el valor para la entrada del libro, la calculamos
+            if(memo[0][libro[i]] == -1) {
 
-            bool resta = sePuede(libro, 0, i, balance + libro[i]);
-
+                memo[0][libro[i]] = sePuede(libro, 0, i, balance - libro[i]);
+                memo[1][libro[i]] = sePuede(libro, 0, i, balance + libro[i]);
+            
+            }
+                
+            bool suma = memo[0][libro[i]];
+            bool resta = memo[1][libro[i]];
+            
             if(suma && resta)
                 signos[i] = '?';
 
