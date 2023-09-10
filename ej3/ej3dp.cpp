@@ -16,20 +16,13 @@ int sumaElementos(vector<int>& s) {
 }
 
 void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) {
-    
-    int offset = m[0].size() / 2;
-    
-    bool primer2Resta = false;
-    bool primer2Suma = false;
-    bool segundo2Resta = false;
-    bool segundo2Suma = false;
 
-    int cont2;
+    int offset = m[0].size() / 2;       int cont2;
+    bool primer2Resta = false; bool primer2Suma = false; bool segundo2Resta = false; bool segundo2Suma = false;
 
     for(int i = m.size() - 1; i > 0; i--) {
-        
-        cont2 = 0;
 
+        cont2 = 0;
         for(int j = 0; j < m[0].size(); j++) {
 
             if(m[i][j] == 2) {
@@ -38,7 +31,7 @@ void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) 
 
                     primer2Resta = (j - libro[i] >= 0) ? (m[i - 1][j - libro[i]] == 2) : false;
                     primer2Suma =  (j + libro[i] < m[0].size()) ? (m[i - 1][j + libro[i]] == 2) : false;
-                
+
                 } else if(cont2 == 2) {
 
                     segundo2Resta = (j - libro[i] >= 0) ? (m[i - 1][j - libro[i]] == 2) : false;
@@ -50,7 +43,7 @@ void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) 
 
         if((primer2Suma && segundo2Resta) || (primer2Resta && primer2Suma))
             signos[i] = '?';
-        
+
         else if(primer2Suma && segundo2Suma)
             signos[i] = '-';
 
@@ -62,30 +55,24 @@ void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) 
 
         else if(primer2Resta)
             signos[i] = '+';
+    }
 
-
-    }  
-
-    cont2 = 0;
-    int tmp;
+    cont2 = 0;       int tmp;
     for(int j = 0; j < m[0].size(); j++) {
         if(m[0][j] == 2) {
             tmp = j;
             cont2++;
         }
     }
-            
+
     if(cont2 == 1) {
         if(tmp > offset)
             signos[0] = '+';
         else
             signos[0] = '-';
 
-    } else if(cont2 == 2) 
+    } else if(cont2 == 2)
         signos[0] = '?';
-
-
-                
 }
 
 
@@ -121,71 +108,61 @@ void interseccion(vector<int>& libro, vector<vector<int>>& m, int index, int bal
 
 }
 
+void construir(vector<int>& libro, vector<vector<int>>& m, int index, int balanceActual){
+
+    if((index < libro.size()) && (balanceActual >= 0) && (balanceActual < m[0].size())){
+        m[index][balanceActual] = 1;
+        construir(libro, m, index + 1, balanceActual - libro[index + 1]);
+        construir(libro, m, index + 1, balanceActual + libro[index + 1]);
+    }
+}
+
 void afip(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m, int index, int balanceFinal) {
-    
+
     // Calcular el offset para encontrar la posicion en la que nuestro balance es 0
     int offset =  m[0].size()/2;
-    
-    // Setear las dos primeras posibilidades
-    m[0][offset + libro[0]] = 1;
-    m[0][offset - libro[0]] = 1;
 
     // Construir la matriz con todos los posibles caminos
-    for (int i = 1; i < libro.size(); i++)
-        {
-            for (int j = 0; j < m[0].size() ; j++)
-            {
-                bool valorIzquierda = false;
-                bool valorDerecha = false; 
-                if (j - libro[i] >= 0)
-                {
-                    valorIzquierda = m[i - 1][j - libro[i]];
-                }
+    construir(libro, m, 0, offset + libro[0]);
+    construir(libro, m, 0, offset - libro[0]);
 
-                if (j + libro[i] < offset * 2)
-                {
-                    valorDerecha = m[i - 1][j + libro[i]];
-                }
-                
-                m[i][j] = m[i][j] || valorDerecha || valorIzquierda;
-            }
-        }
-
+    // Calcular interseccion
     interseccion(libro, m, m.size() - 1, balanceFinal + offset);
 
+    // Dar el resultado
     resolver(libro, signos, m);
 
 }
 
 int main() {
-    
+
     int test_cases_number;
     int n;
     int balanceFinal;
 
     cin >> test_cases_number;
-    
+
     for(int i = 0; i < test_cases_number; i++) {
         cin >> n;
         cin >> balanceFinal;
         balanceFinal = balanceFinal / 100;
-                
+
         vector<int> libro(n);
         vector<char> signos(n);
-        
+
         for (int i = 0; i < n; i++) {
             cin >> libro[i];
             libro[i] = libro[i] / 100;
         }
 
         int sizeMatriz = sumaElementos(libro);
-        
+
         vector<vector<int>> m(n, vector<int>(2 * sizeMatriz + 1, false));
 
         int offset =  m[0].size()/2;
 
         balanceFinalEsperado = balanceFinal + offset;
-        
+
         afip(libro, signos, m, 0, balanceFinal);
 
         for (int i = 0; i < n; i++) {
