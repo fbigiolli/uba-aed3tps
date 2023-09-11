@@ -14,83 +14,144 @@ int sumaElementos(vector<int>& s) {
     return suma;
 }
 
-void interseccion(vector<int>& libro, vector<vector<int>>& m, int index, int balanceActual,vector<char>& signos,int indicead,int balanceAnterior,vector<int>& filas) {
+void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) {
+    
+    int offset = m[0].size() / 2;
+    
+    bool primer2Resta = false;
+    bool primer2Suma = false;
+    bool segundo2Resta = false;
+    bool segundo2Suma = false;
 
-    if(index >= 0 && balanceActual >= 0 && balanceActual < m[0].size() && m[index][balanceActual]) {
-        m[index][balanceActual] = 2;
-        filas[index]++;
-        if (indicead < m.size()){
+    int cont2;
 
-            bool primer2Resta = false;
-            bool primer2Suma = false;
-            bool segundo2Resta = false;
-            bool segundo2Suma = false;
+    for(int i = m.size() - 1; i > 0; i--) {
+        
+        cont2 = 0;
 
-            if (m[indicead][balanceAnterior] == 2) {
-                if (filas[indicead] == 1) {
+        for(int j = 0; j < m[0].size(); j++) {
 
-                    primer2Resta = (balanceAnterior - libro[indicead] >= 0) && (m[index][balanceAnterior - libro[indicead]] == 2);
-                    primer2Suma = (balanceAnterior + libro[indicead] < m[0].size()) && (m[index][balanceAnterior + libro[indicead]] == 2);
+            if(m[i][j] == 2) {
+                cont2++;
+                if(cont2 == 1) {
 
-                } else if (filas[indicead] == 2) {
+                    primer2Resta = (j - libro[i] >= 0) ? (m[i - 1][j - libro[i]] == 2) : false;
+                    primer2Suma =  (j + libro[i] < m[0].size()) ? (m[i - 1][j + libro[i]] == 2) : false;
+                
+                } else if(cont2 == 2) {
 
-                    segundo2Resta = (balanceAnterior - libro[indicead] >= 0) && (m[index][balanceAnterior - libro[indicead]] == 2);
-                    segundo2Suma = (balanceAnterior + libro[indicead] < m[0].size()) && (m[index][balanceAnterior + libro[indicead]] == 2);
+                    segundo2Resta = (j - libro[i] >= 0) ? (m[i - 1][j - libro[i]] == 2) : false;
+                    segundo2Suma =  (j + libro[i] < m[0].size()) ? (m[i - 1][j + libro[i]] == 2) : false;
 
                 }
             }
-
-            if ((primer2Suma && segundo2Resta) || (primer2Resta && primer2Suma))
-                signos[indicead] = '?';
-
-            else if (primer2Suma && segundo2Suma)
-                signos[indicead] = '-';
-
-            else if (primer2Resta && segundo2Resta)
-                signos[indicead] = '+';
-
-            else if (primer2Suma)
-                signos[indicead] = '-';
-
-            else if (primer2Resta)
-                signos[indicead] = '+';
-
         }
-        interseccion(libro, m, index - 1, balanceActual - libro[index],signos,indicead - 1,balanceActual,filas);
-        interseccion(libro, m, index - 1, balanceActual + libro[index],signos,indicead - 1,balanceActual,filas);
+
+        if((primer2Suma && segundo2Resta) || (primer2Resta && primer2Suma))
+            signos[i] = '?';
+        
+        else if(primer2Suma && segundo2Suma)
+            signos[i] = '-';
+
+        else if(primer2Resta && segundo2Resta)
+            signos[i] = '+';
+
+        else if(primer2Suma)
+            signos[i] = '-';
+
+        else if(primer2Resta)
+            signos[i] = '+';
+
+
+    }  
+
+    cont2 = 0;
+    int tmp;
+    for(int j = 0; j < m[0].size(); j++) {
+        if(m[0][j] == 2) {
+            tmp = j;
+            cont2++;
+        }
     }
-    return;
+            
+    if(cont2 == 1) {
+        if(tmp > offset)
+            signos[0] = '+';
+        else
+            signos[0] = '-';
+
+    } else if(cont2 == 2) 
+        signos[0] = '?';
+
+
+                
+}
+
+void interseccion(vector<int>& libro, vector<vector<int>>& m, int index, int balanceActual) {
+
+    if(index >= 0 && balanceActual >= 0 && balanceActual < m[0].size() && m[index][balanceActual] == 1) {
+        m[index][balanceActual] = 2;
+        if (index > 0)
+        {
+            if (m[index - 1][balanceActual - libro[index]] != 2)
+            {
+                interseccion(libro, m, index - 1, balanceActual - libro[index]);
+            }
+
+            if (m[index - 1][balanceActual + libro[index]] != 2)
+            {
+                interseccion(libro, m, index - 1, balanceActual + libro[index]);
+            }   
+        }
+        
+        else{
+            interseccion(libro, m, index - 1, balanceActual - libro[index]);
+            interseccion(libro, m, index - 1, balanceActual + libro[index]);
+        }
+
+    }
 
 }
 
 void construir(vector<int>& libro, vector<vector<int>>& m, int index, int balanceActual){
-    // 0 .
-    // maximoPos =700.
-    // 500 y -500
-    // balanceTotalEsperado = -200
 
-    // 500 - 700 >= -200 entonces false  o 500 + 700 <= -200 entonces false
-    // -500 - 700 >= -200 entonces false o -500 + 700 <= -200 entonces false
-
-    // balanceActual - maximoPos >= balanceTotalEsperado && balance
-
-    int maximoPosible =0 ;
+    // Si no es posible llegar al balance esperado con los valores que nos quedan en el libro, cortamos la recursion
+    // int maximoPosible =0 ;
     int offset = m[0].size()/2;
-    bool esPosibleLlegar = true;
-    for (int i = index + 1; i < libro.size(); i++)
-    {
-        maximoPosible += libro[i];
-    }
+    // bool esPosibleLlegar = true;
+    // for (int i = index + 1; i < libro.size(); i++)
+    // {
+    //     maximoPosible += libro[i];
+    // }
 
-    if (balanceActual - maximoPosible - offset > balanceTotalEsperado || balanceActual  + maximoPosible - offset < balanceTotalEsperado )
-    {
-        esPosibleLlegar = false;
-    }
+    // if (balanceActual - maximoPosible - offset > balanceTotalEsperado || balanceActual  + maximoPosible - offset < balanceTotalEsperado )
+    // {
+    //     esPosibleLlegar = false;
+    // }
 
-    if(esPosibleLlegar && (index < libro.size()) && (balanceActual >= 0) && (balanceActual < m[0].size())){
+    if((index < libro.size()) && (balanceActual >= 0) && (balanceActual < m[0].size()) && m[index][balanceActual] != 1){
         m[index][balanceActual] = 1;
-        construir(libro, m, index + 1, balanceActual - libro[index + 1]);
-        construir(libro, m, index + 1, balanceActual + libro[index + 1]);
+
+        if (index < libro.size() - 1)
+        {
+            if (m[index + 1][balanceActual - libro[index + 1]] != 1)
+            {
+                construir(libro, m, index + 1, balanceActual - libro[index + 1]);
+            }
+
+            if (m[index + 1][balanceActual + libro[index + 1]] != 1)
+            {      
+                construir(libro, m, index + 1, balanceActual + libro[index + 1]);
+            }
+        }
+
+        else
+        {
+            construir(libro, m, index + 1, balanceActual - libro[index + 1]);
+            construir(libro, m, index + 1, balanceActual + libro[index + 1]);
+        }
+        
+
     }
     return;
 }
@@ -99,52 +160,20 @@ void afip(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m, int 
 
     // Calcular el offset para encontrar la posicion en la que nuestro balance es 0
     int offset =  m[0].size()/2;
-    
-    // Setear las dos primeras posibilidades
-    m[0][offset + libro[0]] = 1;
-    m[0][offset - libro[0]] = 1;
 
     // Construir la matriz con todos los posibles caminos
-    for (int i = 1; i < libro.size(); i++)
-        {
-            for (int j = 0; j < m[0].size() ; j++)
-            {
-                bool valorIzquierda = false;
-                bool valorDerecha = false; 
-                if (j - libro[i] >= 0)
-                {
-                    valorIzquierda = m[i - 1][j - libro[i]];
-                }
+    construir(libro, m, 0, offset + libro[0]);
+    construir(libro, m, 0, offset - libro[0]);
 
-                if (j + libro[i] < offset * 2)
-                {
-                    valorDerecha = m[i - 1][j + libro[i]];
-                }
-                
-                m[i][j] = m[i][j] || valorDerecha || valorIzquierda;
-            }
-        }
-
+    
 
     // Calcular interseccion y armar vector de signos desde la ultima hasta la segunda posicion
-    int indiceAd=m.size();
-    int balanceAnterior = 0;
-    vector<int> filas(m.size());
-    interseccion(libro, m, m.size() - 1, balanceFinal + offset,signos,indiceAd,balanceAnterior,filas);
+    interseccion(libro, m, m.size() - 1, balanceFinal + offset);
 
-    // Definir el valor del primer signo
-    if (m[0][libro[0] + offset] == 2 && m[0][-libro[0]+offset] == 2)
-    {
-        signos[0] = '?';
-    }
+   
 
-    else if(m[0][libro[0]+offset] == 2)
-    {
-        signos[0] = '+';
-    }
+    resolver(libro, signos, m);
 
-    else
-        signos[0] = '-';
 }
 
 int main() {
