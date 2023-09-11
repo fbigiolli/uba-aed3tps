@@ -42,12 +42,12 @@ void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) 
 
                     segundo2Resta = (j - libro[i] >= 0) ? (m[i - 1][j - libro[i]] == 2) : false;
                     segundo2Suma =  (j + libro[i] < m[0].size()) ? (m[i - 1][j + libro[i]] == 2) : false;
-
+                    break;
                 }
             }
         }
 
-        if((primer2Suma && segundo2Resta) || (primer2Resta && primer2Suma))
+        if((primer2Suma && segundo2Resta) || (primer2Resta && segundo2Suma) || (primer2Resta && primer2Suma))
             signos[i] = '?';
         
         else if(primer2Suma && segundo2Suma)
@@ -62,7 +62,10 @@ void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) 
         else if(primer2Resta)
             signos[i] = '+';
 
-
+        primer2Resta = false;
+        primer2Suma = false;
+        segundo2Resta = false;
+        segundo2Suma = false;
     }  
 
     cont2 = 0;
@@ -165,14 +168,38 @@ void afip(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m, int 
     construir(libro, m, 0, offset + libro[0]);
     construir(libro, m, 0, offset - libro[0]);
 
-    
+                for(int i = 0; i < m.size(); i++) {
+            for(int j = 0; j < m[0].size(); j++) {
+                cout << m[i][j] << " ";
+            }
+        cout << endl;
+        }
+
+        cout << endl;
 
     // Calcular interseccion y armar vector de signos desde la ultima hasta la segunda posicion
     interseccion(libro, m, m.size() - 1, balanceFinal + offset);
 
-   
+
 
     resolver(libro, signos, m);
+
+    for (int i = 0; i < libro.size(); i++)
+    {
+        if (libro[i] == 0)
+        {
+            signos[i] = '?';
+        }
+        
+    }
+
+            for(int i = 0; i < m.size(); i++) {
+            for(int j = 0; j < m[0].size(); j++) {
+                cout << m[i][j] << " ";
+            }
+        cout << endl;
+        }
+    
 
 }
 
@@ -208,7 +235,7 @@ int main() {
         afip(libro, signos, m, 0, balanceFinal);
 
         for (int i = 0; i < n; i++) {
-            cout << signos[i];
+            cout << signos[i];  
         }
 
         cout << endl;
