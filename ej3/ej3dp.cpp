@@ -99,10 +99,32 @@ void afip(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m, int 
 
     // Calcular el offset para encontrar la posicion en la que nuestro balance es 0
     int offset =  m[0].size()/2;
+    
+    // Setear las dos primeras posibilidades
+    m[0][offset + libro[0]] = 1;
+    m[0][offset - libro[0]] = 1;
 
     // Construir la matriz con todos los posibles caminos
-    construir(libro, m, 0, offset + libro[0]);
-    construir(libro, m, 0, offset - libro[0]);
+    for (int i = 1; i < libro.size(); i++)
+        {
+            for (int j = 0; j < m[0].size() ; j++)
+            {
+                bool valorIzquierda = false;
+                bool valorDerecha = false; 
+                if (j - libro[i] >= 0)
+                {
+                    valorIzquierda = m[i - 1][j - libro[i]];
+                }
+
+                if (j + libro[i] < offset * 2)
+                {
+                    valorDerecha = m[i - 1][j + libro[i]];
+                }
+                
+                m[i][j] = m[i][j] || valorDerecha || valorIzquierda;
+            }
+        }
+
 
     // Calcular interseccion y armar vector de signos desde la ultima hasta la segunda posicion
     int indiceAd=m.size();
