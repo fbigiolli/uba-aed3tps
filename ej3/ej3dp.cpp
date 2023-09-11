@@ -14,61 +14,71 @@ int sumaElementos(vector<int>& s) {
     return suma;
 }
 
+bool definirSigno(bool resta, bool suma, vector<char>& signos,int index){
+
+    // Establecer el valor del signo que nos entra
+    char signo;
+
+    // Si tanto suma como resta son true, pongo signo de pregunta
+    if (suma && resta)
+    {
+        signos[index] = '?';
+        return false;
+    }
+    if(suma)
+        signo = '-';
+
+    if(resta)
+        signo = '+';
+
+    // Si el signo ya estaba previamente definido, o sea, no es el primer 2 de la fila
+    if (signos[index] != '/')
+    {
+        // Si es el mismo signo del que veniamos seguimos con la iteracion del for
+        if ((signos[index] == '+' && signo == '+') || (signos[index] == '-' && signo == '-')){
+            return true;
+        }
+
+        // Si el signo del que veniamos es distinto al que esta puesto, seteamos el signo de pregunta y cortamos la iteracion de la fila
+        else if ((signos[index] == '+' && signo == '-') || (signo == '+' && signos[index] == '-'))
+        {
+            signos[index] = '?';
+            return false;
+        }
+    }
+
+    // Si el signo no estaba definido, lo definimos
+    else
+    {
+       signos[index] = signo;
+       return true;
+    }   
+}
+
 void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) {
     
     int offset = m[0].size() / 2;
     
-    bool primer2Resta = false;
-    bool primer2Suma = false;
-    bool segundo2Resta = false;
-    bool segundo2Suma = false;
-
-    int cont2;
+    bool resta = false;
+    bool suma = false;
 
     for(int i = m.size() - 1; i > 0; i--) {
         
-        cont2 = 0;
-
         for(int j = 0; j < m[0].size(); j++) {
-
             if(m[i][j] == 2) {
-                cont2++;
-                if(cont2 == 1) {
-
-                    primer2Resta = (j - libro[i] >= 0) ? (m[i - 1][j - libro[i]] == 2) : false;
-                    primer2Suma =  (j + libro[i] < m[0].size()) ? (m[i - 1][j + libro[i]] == 2) : false;
-                
-                } else if(cont2 == 2) {
-
-                    segundo2Resta = (j - libro[i] >= 0) ? (m[i - 1][j - libro[i]] == 2) : false;
-                    segundo2Suma =  (j + libro[i] < m[0].size()) ? (m[i - 1][j + libro[i]] == 2) : false;
+                resta = (j - libro[i] >= 0) ? (m[i - 1][j - libro[i]] == 2) : false;
+                suma =  (j + libro[i] < m[0].size()) ? (m[i - 1][j + libro[i]] == 2) : false;
+                bool sigueIteracion = definirSigno(resta,suma,signos,i);
+                if (!sigueIteracion)
+                {
                     break;
                 }
             }
         }
+    }
 
-        if((primer2Suma && segundo2Resta) || (primer2Resta && segundo2Suma) || (primer2Resta && primer2Suma))
-            signos[i] = '?';
-        
-        else if(primer2Suma && segundo2Suma)
-            signos[i] = '-';
-
-        else if(primer2Resta && segundo2Resta)
-            signos[i] = '+';
-
-        else if(primer2Suma)
-            signos[i] = '-';
-
-        else if(primer2Resta)
-            signos[i] = '+';
-
-        primer2Resta = false;
-        primer2Suma = false;
-        segundo2Resta = false;
-        segundo2Suma = false;
-    }  
-
-    cont2 = 0;
+    // Definir el primer signo dependiendo de la cantidad de 2 que encontremos en la primer fila
+    int cont2 = 0;
     int tmp;
     for(int j = 0; j < m[0].size(); j++) {
         if(m[0][j] == 2) {
@@ -85,12 +95,10 @@ void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) 
 
     } else if(cont2 == 2) 
         signos[0] = '?';
-
-
                 
 }
 
-void interseccion(vector<int>& libro, vector<vector<int>>& m, int index, int balanceActual) {
+void interseccion(vector<int>& libro, vector<vector<int>>& m, int index, int balanceActual){
 
     if(index >= 0 && balanceActual >= 0 && balanceActual < m[0].size() && m[index][balanceActual] == 1) {
         m[index][balanceActual] = 2;
@@ -168,14 +176,8 @@ void afip(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m, int 
     construir(libro, m, 0, offset + libro[0]);
     construir(libro, m, 0, offset - libro[0]);
 
-                for(int i = 0; i < m.size(); i++) {
-            for(int j = 0; j < m[0].size(); j++) {
-                cout << m[i][j] << " ";
-            }
-        cout << endl;
-        }
 
-        cout << endl;
+
 
     // Calcular interseccion y armar vector de signos desde la ultima hasta la segunda posicion
     interseccion(libro, m, m.size() - 1, balanceFinal + offset);
@@ -193,13 +195,7 @@ void afip(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m, int 
         
     }
 
-            for(int i = 0; i < m.size(); i++) {
-            for(int j = 0; j < m[0].size(); j++) {
-                cout << m[i][j] << " ";
-            }
-        cout << endl;
-        }
-    
+
 
 }
 
@@ -217,7 +213,7 @@ int main() {
         balanceFinal = balanceFinal / 100;
 
         vector<int> libro(n);
-        vector<char> signos(n);
+        vector<char> signos(n, '/');
 
         for (int i = 0; i < n; i++) {
             cin >> libro[i];
