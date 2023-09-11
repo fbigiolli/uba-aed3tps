@@ -3,12 +3,11 @@
 
 using namespace std;
 
-int balanceTotalEsperado;
-
 // Funcion para calcular el size que va a requerir la matriz.
 int sumaElementos(vector<int>& s) {
     int suma = 0;
-    for(int i = 0; i < s.size(); i++) {
+    for(int i = 0; i < s.size(); i++) 
+    {
         suma += s[i];
     }
     return suma;
@@ -62,12 +61,18 @@ void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) 
     bool resta = false;
     bool suma = false;
 
-    for(int i = m.size() - 1; i > 0; i--) {
-        
-        for(int j = 0; j < m[0].size(); j++) {
-            if(m[i][j] == 2) {
+    // Recorrer toda la matriz de abajo hacia arriba 
+    for(int i = m.size() - 1; i > 0; i--) 
+    {
+        for(int j = 0; j < m[0].size(); j++)
+         {
+            // Si encontramos un 2 en la posicion actual
+            if(m[i][j] == 2) 
+            {
+                // Nos fijamos si hay un camino valido revisando las posiciones de arriba
                 resta = (j - libro[i] >= 0) ? (m[i - 1][j - libro[i]] == 2) : false;
                 suma =  (j + libro[i] < m[0].size()) ? (m[i - 1][j + libro[i]] == 2) : false;
+                // Llamamos a la funcion que define el signo que corresponde y nos guardamos el bool que retorna para cortar la iteracion en caso de que ya haya un signo de pregunta.
                 bool sigueIteracion = definirSigno(resta,suma,signos,i);
                 if (!sigueIteracion)
                 {
@@ -80,27 +85,32 @@ void resolver(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m) 
     // Definir el primer signo dependiendo de la cantidad de 2 que encontremos en la primer fila
     int cont2 = 0;
     int tmp;
-    for(int j = 0; j < m[0].size(); j++) {
-        if(m[0][j] == 2) {
+    for(int j = 0; j < m[0].size(); j++)
+    {
+        if(m[0][j] == 2)
+         {
             tmp = j;
             cont2++;
         }
     }
             
-    if(cont2 == 1) {
+    if(cont2 == 1) 
+    {
         if(tmp > offset)
             signos[0] = '+';
         else
             signos[0] = '-';
 
-    } else if(cont2 == 2) 
+    } 
+    
+    else if(cont2 == 2) 
         signos[0] = '?';
-                
 }
 
 void interseccion(vector<int>& libro, vector<vector<int>>& m, int index, int balanceActual){
 
-    if(index >= 0 && balanceActual >= 0 && balanceActual < m[0].size() && m[index][balanceActual] == 1) {
+    if(index >= 0 && balanceActual >= 0 && balanceActual < m[0].size() && m[index][balanceActual] == 1) 
+    {
         m[index][balanceActual] = 2;
         if (index > 0)
         {
@@ -115,32 +125,20 @@ void interseccion(vector<int>& libro, vector<vector<int>>& m, int index, int bal
             }   
         }
         
-        else{
+        else
+        {
             interseccion(libro, m, index - 1, balanceActual - libro[index]);
             interseccion(libro, m, index - 1, balanceActual + libro[index]);
         }
-
     }
-
 }
 
 void construir(vector<int>& libro, vector<vector<int>>& m, int index, int balanceActual){
 
-    // Si no es posible llegar al balance esperado con los valores que nos quedan en el libro, cortamos la recursion
-    // int maximoPosible =0 ;
     int offset = m[0].size()/2;
-    // bool esPosibleLlegar = true;
-    // for (int i = index + 1; i < libro.size(); i++)
-    // {
-    //     maximoPosible += libro[i];
-    // }
 
-    // if (balanceActual - maximoPosible - offset > balanceTotalEsperado || balanceActual  + maximoPosible - offset < balanceTotalEsperado )
-    // {
-    //     esPosibleLlegar = false;
-    // }
-
-    if((index < libro.size()) && (balanceActual >= 0) && (balanceActual < m[0].size()) && m[index][balanceActual] != 1){
+    if((index < libro.size()) && (balanceActual >= 0) && (balanceActual < m[0].size()) && m[index][balanceActual] != 1)
+    {
         m[index][balanceActual] = 1;
 
         if (index < libro.size() - 1)
@@ -161,10 +159,7 @@ void construir(vector<int>& libro, vector<vector<int>>& m, int index, int balanc
             construir(libro, m, index + 1, balanceActual - libro[index + 1]);
             construir(libro, m, index + 1, balanceActual + libro[index + 1]);
         }
-        
-
     }
-    return;
 }
 
 void afip(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m, int index, int balanceFinal) {
@@ -176,16 +171,13 @@ void afip(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m, int 
     construir(libro, m, 0, offset + libro[0]);
     construir(libro, m, 0, offset - libro[0]);
 
-
-
-
     // Calcular interseccion y armar vector de signos desde la ultima hasta la segunda posicion
     interseccion(libro, m, m.size() - 1, balanceFinal + offset);
 
-
-
+    // Llamar a la funcion que resuelve el problema
     resolver(libro, signos, m);
 
+    // En caso de haber encontrado ceros, poner signos de pregunta en esas posiciones
     for (int i = 0; i < libro.size(); i++)
     {
         if (libro[i] == 0)
@@ -194,9 +186,6 @@ void afip(vector<int>& libro, vector<char>& signos, vector<vector<int>>& m, int 
         }
         
     }
-
-
-
 }
 
 int main() {
@@ -207,7 +196,8 @@ int main() {
 
     cin >> test_cases_number;
 
-    for(int i = 0; i < test_cases_number; i++) {
+    for(int i = 0; i < test_cases_number; i++) 
+    {
         cin >> n;
         cin >> balanceFinal;
         balanceFinal = balanceFinal / 100;
@@ -215,22 +205,23 @@ int main() {
         vector<int> libro(n);
         vector<char> signos(n, '/');
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) 
+        {
             cin >> libro[i];
             libro[i] = libro[i] / 100;
         }
 
+        //Definimos el tamaño de la Matriz sumando todos sus elementos para hallar el rango
         int sizeMatriz = sumaElementos(libro);
 
         vector<vector<int>> m(n, vector<int>(2 * sizeMatriz + 1, 0));
-
-        balanceTotalEsperado = balanceFinal;
-
+        
         int offset =  m[0].size()/2;
 
         afip(libro, signos, m, 0, balanceFinal);
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) 
+        {
             cout << signos[i];  
         }
 
