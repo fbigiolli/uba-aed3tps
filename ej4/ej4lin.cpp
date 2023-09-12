@@ -8,78 +8,6 @@ int minPosible = 1e9;
 vector<int> res;
 
 /*
-puestos = {1, 5, 15, 20}
-proves = {-1, -1}
-
-
-
- 2 proovedurias.
-puestos = 1 5 15 20
-
------------------------------------------------------
- PROVES=       0     |     1    |   2     |    3    |
----------------------|----------|---------|---------|-------------------------------------------------------------------------------------------------------
-Puesto 0|0     0     |     4    |   14    |    19   |
----------------------|----------|---------|---------|-------------------------------------------------------------------------------------------------------
-Puesto 1|1     4     |     0    |   10    |    15   |
----------------------|----------|---------|---------|-------------------------------------------------------------------------------------------------------
-Puesto 2|2     14    |     10   |    0    |     5   |
----------------------|----------|---------|---------|-------------------------------------------------------------------------------------------------------
-Puesto 3|3     19    |     15   |    5    |     0   |
----------------------|----------|---------|---------|-------------------------------------------------------------------------------------------------------
-*/
-
-
-
-
-void printMatriz(vector<vector<int>>& matriz) {
-    cout << "   ";
-    for(int k = 0; k < matriz.size(); k++)
-        cout << " " << k;
-    cout << endl;
-
-    cout << "   ";
-    for(int k = 0; k < matriz.size(); k++)
-        cout << "--";
-    cout << endl;
-
-    for(int i = 0; i < matriz.size(); i++) {
-        cout << i << " | ";
-        for(int j = 0; j < matriz.size(); j++)
-            cout << matriz[i][j] << " ";
-        cout << endl;
-    }
-}
-
-
-void construirMatriz(vector<vector<int>>& costoRespectoAProve, vector<int>& puestos){
-    for (int i = 0; i < puestos.size(); i++) 
-    {
-        for (int j = 0; j < puestos.size(); j++)
-        {
-            costoRespectoAProve[i][j] = abs(puestos[i] - puestos[j]);
-        }
-    }
-}
-
-/*
-
-
-puestos = {1, 5, 15, 20}
-9
-1 15
-
-    0    1   2    3
-   ------------------
-0 |  0   4  14   19
-1 |  4   0  10   15
-2 | 14  10  0    5
-3 | 19  15  5    0
-
-ultProve = 1
-m[ultProve + 1][ultProve] , m[ultProve + 1][index] = 10 , 5 = 5
-CostoActual = 4 + 10 + 15 =
-Costo nuevo = 4 + 5 + 0 =
 
 Ejemplo 1
 Tenemos los puestos = {1, 5, 15, 20, 23}
@@ -167,68 +95,71 @@ k = 2 proveedurías
 
 
 
-
 */
-//{0,1} ... {0,2} ... {0,3} ... {1,2} ... {1,3} ... {2,3} ...
-void calcular(vector<vector<int>>& costoRespectoAProve, vector<int>& proves, vector<int>& puestos, int index, int cantProvesRestantes, int costoActual){
 
-    // Caso base
-    if (cantProvesRestantes == 0 || index > puestos.size() - 1) {
-        // Si el costo actual es menor al minimo anterior, actualizamos
-        if (minPosible > costoActual && cantProvesRestantes == 0) {
-            minPosible = costoActual;
-            res = proves;
-        }
-        return;
+void printGrupos(vector<vector<int>>& grupos) {
+    for(int i = 0; i < grupos.size(); i++) {
+        for(int j = 0; j < grupos[i].size(); j++)
+            cout << grupos[i][j] << " ";
+        cout << endl;
     }
-
-    // Si ya no es posible llegar a una solucion que ponga todas las proveedurias
-    if (cantProvesRestantes > puestos.size() - index)
-        return;
-
-    // Actualizar el costo con la nueva prove que agregamos
-    // Si todavia no agregamos ninguna prove, ponemos la primera y calculamos los costos respecto a esa prove
-    int costoNoActualizado = costoActual;
-    if (proves.size() == 0) {
-        proves.push_back(index);
-        for (int i = 0; i < puestos.size(); i++) {
-            costoActual += costoRespectoAProve[i][index];
-        }
-        calcular(costoRespectoAProve, proves, puestos, index + 1, cantProvesRestantes - 1, costoActual);
-        proves.pop_back();
-        costoActual = costoNoActualizado;
-    }
-
-    // Si no, agregamos otra y comparamos los valores
-    else {
-        int ultimaProve = proves[proves.size() - 1];
-        for (int i = ultimaProve + 1; i < puestos.size(); i++)
-        {
-            int costoAnterior = costoRespectoAProve[i][ultimaProve];
-            int costoNuevo =  costoRespectoAProve[i][index];
-            if (costoNuevo < costoAnterior) {
-                costoActual = costoActual + costoNuevo - costoAnterior;
-            }
-        }
-
-        // Llamado recursivo agregando prove en esta posicion
-        proves.push_back(index);
-        calcular(costoRespectoAProve, proves, puestos, index + 1, cantProvesRestantes - 1, costoActual);
-        proves.pop_back();
-        costoActual = costoNoActualizado;
-    }
-
-    // Llamado recursivo sin agregar prove en esta posicion
-    calcular(costoRespectoAProve, proves, puestos, index + 1, cantProvesRestantes, costoActual);
 }
 
-void chori(vector<vector<int>>& costoRespectoAProve, vector<int>& puestos, vector<int>& proves, int cantProvesRestantes){
 
-    construirMatriz(costoRespectoAProve, puestos);
+void armarGrupos(vector<int>& puestos, int cantProves, vector<vector<int>> grupos) {
+
+    // Calculo el tamaño aproximado de cada grupo
+    int tamanio = puestos.size() / cantProves;
+
+    // Vector temporal
+    vector<int> tmp = {}; 
+
+    // Armo los grupos de ese tamaño
+    for(int i = 0; i < puestos.size(); i++) {
+        tmp.push_back(puestos[i]);
+        if(tmp.size() >= tamanio) {
+            grupos.push_back(tmp);
+            tmp = {};
+        }
+    }
+
+    // printGrupos(grupos);
+
+    // Los recorro y me fijo si tengo que reorganizar
+    for(int i = 0; i < grupos.size() - 1; i++) {
+
+        int tamañoA = grupos[i].size();
+        int tamañoB = grupos[i + 1].size();
+
+        int primA = grupos[i][0];
+        int primB = grupos[i + 1][tamañoB - 1];
+
+        int ultA = grupos[i][tamañoA - 1];
+        int ultB = grupos[i + 1][0];
+
+        if(ultA - primA > ultA - ultB) {
+            // Lo saco de A y lo pongo en B
+            grupos[i].pop_back();
+            grupos[i + 1].push_back(ultA);
+        } else if()
+
+
+    }
+
+} 
+
+void asignarProves(vector<int>& proves, vector<vector<int>>& grupos) {
+
+} 
+
+
+void chori(vector<int>& puestos, int cantProves, vector<int>& proves, vector<vector<int>> grupos){
+
+    armarGrupos(puestos, cantProves, grupos);
 
     // printMatriz(costoRespectoAProve);
 
-    calcular(costoRespectoAProve, proves, puestos, 0, cantProvesRestantes, 0);
+    asignarProves(proves, grupos);
 
 }
 
@@ -251,17 +182,9 @@ int main() {
             cin >> puestos[i];
 
         vector<int> proves = {};
+        vector<vector<int>> grupos = {};
 
-        // Inicializar una matriz de n*n para guardar el costo de un puesto respecto a donde hay proveeduria
-        vector<vector<int>> costoRespectoAProve(cantPuestos,vector<int>(cantPuestos));
-
-        chori(costoRespectoAProve, puestos, proves, cantProves);
-
-        cout << minPosible << endl;
-
-        for(int i = 0; i < res.size(); i++)
-            cout << puestos[res[i]] << " ";
-        cout << endl;
+        chori(puestos, cantProves, proves, grupos);
 
         minPosible = 1e9;
         proves = {};
