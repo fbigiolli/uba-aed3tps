@@ -20,25 +20,6 @@ int distancia(vector<int>& puestos, vector<int>& proves) {
     return dist;
 }
 
-// {1, 2, 5}
-// {0,0,0}
-// ES UNA LEY PORQUE LO DIJO FACU. 
-/*
-3
-
-
-4 2
-1 5 15 20
-
-puestos = {1, 5, 15, 20}
-proves = {-1, -1}
-
-9
-1 15
-
-
-*/
-
 void chori(vector<int>& puestos, vector<int>& proves, int index) {
 
     // Caso base, llegamos al final de las proves
@@ -101,6 +82,25 @@ int main() {
 
     return 0;
 }
+
+// {1, 2, 5}
+// {0,0,0}
+// ES UNA LEY PORQUE LO DIJO FACU. 
+/*
+3
+
+
+4 2
+1 5 15 20
+
+puestos = {1, 5, 15, 20}
+proves = {-1, -1}
+
+9
+1 15
+
+
+*/
 
 
 /*
