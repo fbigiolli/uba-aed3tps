@@ -137,7 +137,33 @@ en la del "medio" a la izquierda. Si tiene cantidad de elementos impar, al medio
 Quedan entonces las proveedurías en las posiciones {1, 11, 20}, y distancia 12
 
 
+Ejemplo 3
+Tenemos los puestos = {1, 2, 7, 100}
+Y k = 2 proovedurías
 
+Hacemos grupos de n/k elementos
+
+Quedan {1, 2}, {7, 100}
+
+Miramos los límites, vemos que la distancia entre 2 y 7 es menor a 7 y 100. 
+Pasamos el 7 al primer grupo
+
+Quedan {1, 2, 7}, {100}
+
+Primer proveeduría al medio del primer grupo, segunda en el segundo grupo
+
+Quedan las proveedurías en las posiciones {2, 100}, con distancia 6
+
+
+
+Ejemplo 4
+Puestos = {1, 2, 3, 4, 5, 7, 8, 9, 10, 10000}
+k = 2 proveedurías 
+
+2 grupos: {1,2,3,4,5} {7,8,9,10,10000}
+ 1 2 3 4 5 7 8 9 10 10000
+
+{1,100,101,102}     {104,105,106,107,108}
 
 
 
