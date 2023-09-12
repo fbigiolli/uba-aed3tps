@@ -91,6 +91,12 @@ build CMakeFiles/uba_aed3tps.dir/ej3/3BT.cpp.obj: CXX_COMPILER__uba_aed3tps_unsc
   OBJECT_DIR = CMakeFiles\uba_aed3tps.dir
   OBJECT_FILE_DIR = CMakeFiles\uba_aed3tps.dir\ej3
 
+build CMakeFiles/uba_aed3tps.dir/ej4/ej4.cpp.obj: CXX_COMPILER__uba_aed3tps_unscanned_Debug C$:/Users/mateo/Desktop/uba-aed3tps/ej4/ej4.cpp || cmake_object_order_depends_target_uba_aed3tps
+  DEP_FILE = CMakeFiles\uba_aed3tps.dir\ej4\ej4.cpp.obj.d
+  FLAGS = -g -std=gnu++14 -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles\uba_aed3tps.dir
+  OBJECT_FILE_DIR = CMakeFiles\uba_aed3tps.dir\ej4
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target uba_aed3tps
@@ -99,7 +105,7 @@ build CMakeFiles/uba_aed3tps.dir/ej3/3BT.cpp.obj: CXX_COMPILER__uba_aed3tps_unsc
 #############################################
 # Link the executable uba_aed3tps.exe
 
-build uba_aed3tps.exe: CXX_EXECUTABLE_LINKER__uba_aed3tps_Debug CMakeFiles/uba_aed3tps.dir/ej1/ej1.cpp.obj CMakeFiles/uba_aed3tps.dir/ej2/ej2.cpp.obj CMakeFiles/uba_aed3tps.dir/ej3/ej3.cpp.obj CMakeFiles/uba_aed3tps.dir/ej3/ej3dp.cpp.obj CMakeFiles/uba_aed3tps.dir/ej3/Untitled-1.cpp.obj CMakeFiles/uba_aed3tps.dir/ej3/3og.cpp.obj CMakeFiles/uba_aed3tps.dir/ej3/3BT.cpp.obj
+build uba_aed3tps.exe: CXX_EXECUTABLE_LINKER__uba_aed3tps_Debug CMakeFiles/uba_aed3tps.dir/ej1/ej1.cpp.obj CMakeFiles/uba_aed3tps.dir/ej2/ej2.cpp.obj CMakeFiles/uba_aed3tps.dir/ej3/ej3.cpp.obj CMakeFiles/uba_aed3tps.dir/ej3/ej3dp.cpp.obj CMakeFiles/uba_aed3tps.dir/ej3/Untitled-1.cpp.obj CMakeFiles/uba_aed3tps.dir/ej3/3og.cpp.obj CMakeFiles/uba_aed3tps.dir/ej3/3BT.cpp.obj CMakeFiles/uba_aed3tps.dir/ej4/ej4.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\uba_aed3tps.dir
