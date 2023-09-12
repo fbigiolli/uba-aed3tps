@@ -33,14 +33,19 @@ void chori(vector<int>& puestos, vector<int>& proves, int index) {
     } else {
         
         // Busco la ultima posición donde haya una proveeduría, para poner la próxima una posición más adelante
-        int ultPos = 0;
+        int ultPos = puestos[index];
         for(int i = 0; i < proves.size(); i++) {
             if(proves[i] != -1)
                 ultPos = proves[i];
         }
 
+
+        //      {1, 2, -1}
+        // puestos = {1, 5, 15, 20}
+
         // Por cada una de las posiciones disponibles entre la anterior y la posición del último puesto - cantidad de provedurías + proveduría que estamos considerando
         // (para dejar espacio para las que quedan)
+
         for(int i = ultPos + 1; i <= puestos[puestos.size() - 1] - (proves.size() + index); i++) {
             proves[index] = i;
             chori(puestos, proves, index + 1); 
@@ -123,5 +128,8 @@ proves = {-1, -1}
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 8                                                       1
 --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 */
