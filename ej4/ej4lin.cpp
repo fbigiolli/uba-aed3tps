@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 
-
 using namespace std;
 
 int minPosible = 1e9;
@@ -141,7 +140,7 @@ void armarGrupos(vector<int>& puestos, int cantProves, vector<vector<int>> grupo
             // Lo saco de A y lo pongo en B
             grupos[i].pop_back();
             grupos[i + 1].push_back(ultA);
-        } else if()
+        } 
 
 
     }

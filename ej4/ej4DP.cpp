@@ -76,6 +76,7 @@ puestos = {1, 5, 15, 20}
 2 | 14  10  0    5
 3 | 19  15  5    0
 
+
 ultProve = 1
 m[ultProve + 1][ultProve] , m[ultProve + 1][index] = 10 , 5 = 5
 CostoActual = 4 + 10 + 15 =
