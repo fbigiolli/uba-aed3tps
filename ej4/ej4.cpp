@@ -4,9 +4,9 @@
 using namespace std;
 
 int INF = 1e9;
-
 int cantProvesTotal = 0;
 
+// Construye una matriz de costos en la cual cada columna representa la suma de los costos de todos los puestos respecto a la proveeduria puesta en dicha columna.
 void construirMatrizCostos(vector<vector<int>>& costoRespectoAProve, vector<int>& puestos){
     for (int i = 0; i < puestos.size(); i++) {
         for (int j = 0; j < puestos.size(); j++) {
@@ -15,58 +15,38 @@ void construirMatrizCostos(vector<vector<int>>& costoRespectoAProve, vector<int>
     }
 }
 
-int minDist(vector<vector<int>>& costoRespectoAProve, int indActual, int indUltProve, int cantProves) {
-
+// Calcula la distancia efectiva de aquellos puestos que quedan entre la ultima proveeduria puesta y la que estoy poniendo ahora
+int minDist(vector<vector<int>>& costoRespectoAProve, int indActual, int indUltProve, int cantProves) { 
+    
     int res = 0;
     
-    // Si tenemos que poner una sola prove, hacemos la suma total
-    if (cantProves == cantProvesTotal && cantProves == 1)
-    {
-        for (int i = 0; i < costoRespectoAProve.size(); i++)
-        {
-            res+= costoRespectoAProve[i][indActual];
+    if(cantProves == cantProvesTotal) {
+        for (int i = 0; i < indActual; i++) {
+            res += costoRespectoAProve[i][indActual];
         }
-    }
-    
-    else
-    {
-        // Si estoy poniendo la primer prove ahora, pero me quedan mas para poner solo sumo desde el principio hasta esta prove
-        if(cantProves == cantProvesTotal) {
-            for (int i = 0; i < indActual; i++)
-            {
-                res+=costoRespectoAProve[i][indActual];
-            }
-        }
-        
-        else{
+    } else {
+            
         // Calcular el resultado entre la prove anterior y la actual, y en caso que esta sea la ultima terminar de calcular los costos para los puestos que restan
-        for (int i = indUltProve; i <= indActual; i++)
-        {
-                int costoAnterior = costoRespectoAProve[i][indUltProve];
-                int costoNuevo =  costoRespectoAProve[i][indActual];
-                if (costoAnterior > costoNuevo)
-                {
-                    res+=costoNuevo;
-                }
-                else
-                {
-                    res+=costoAnterior;
-                }
+        for (int i = indUltProve; i <= indActual; i++) {
+            int costoAnterior = costoRespectoAProve[i][indUltProve];
+            int costoNuevo =  costoRespectoAProve[i][indActual];
+            if (costoAnterior > costoNuevo) 
+                res += costoNuevo;
+            else
+                res += costoAnterior;
         }
 
+        // Si es la ultima prove que tengo que poner, sumo el costo de todos los puestos que faltan para llegar al final
         if(cantProves == 1) {
-            for (int i = indActual; i < costoRespectoAProve.size(); i++)
-            {
+            for (int i = indActual; i < costoRespectoAProve.size(); i++) {
                 res += costoRespectoAProve[i][indActual];
             }
         }
-        }
-
     }
-
     return res;
 }
 
+// Hace el mismo recorrido que hizo el backtracking que construyo la matriz para determinar la posicion de los puestos.
 void reconstruirVarias(vector<vector<int>>& costoRespectoAProve, vector<vector<vector<int>>>& memo, vector<int>& proves, int i, int j, int k) {
 
     if(k != 0) {
@@ -83,7 +63,7 @@ void reconstruirVarias(vector<vector<int>>& costoRespectoAProve, vector<vector<v
     }
 }
 
-void reconstruirSola(vector<vector<int>>& costoRespectoAProve, vector<vector<vector<int>>>& memo, vector<int>& proves, int i, int j, int k) {
+int reconstruirSola(vector<vector<int>>& costoRespectoAProve, vector<int>& proves) {
     int pos = 0;
     int min = INF;
     int tmp = 0;
@@ -99,7 +79,11 @@ void reconstruirSola(vector<vector<int>>& costoRespectoAProve, vector<vector<vec
         }
     }
     proves.push_back(pos);
+    return min;
 }
+
+//   Chori devuelve: "Arrancando en la posición pos, donde la última proveeduría está puesta en ultProve (0 si no existe), y la cantidad 
+//  de proves restantes es cantProves, devuelve la mínima distancia necesaria para ubicar esa cantidad de proveedurías"
 
 int chori(vector<int>& puestos, vector<vector<int>>& costoRespectoAProve, vector<vector<vector<int>>>& memo, int pos, int ultProve, int cantProves) {
 
@@ -109,7 +93,7 @@ int chori(vector<int>& puestos, vector<vector<int>>& costoRespectoAProve, vector
     if(pos == puestos.size())
         return INF;
 
-    if(memo[pos][ultProve][cantProves] == -1) {
+    if(memo[pos][ultProve][cantProves] == -1) { 
 
         int pongo = chori(puestos, costoRespectoAProve, memo, pos + 1, pos, cantProves - 1) + minDist(costoRespectoAProve, pos, ultProve, cantProves);
 
@@ -152,17 +136,19 @@ int main() {
 
         construirMatrizCostos(costoRespectoAProve, puestos);
 
-        int res = chori(puestos, costoRespectoAProve, memo, 0, 0, cantProves);
+        int res;
 
         if(cantProves == 1)
-            reconstruirSola(costoRespectoAProve, memo, proves, 0, 0, cantProves);
-        else            
+            res = reconstruirSola(costoRespectoAProve, proves);
+        else {
+            res = chori(puestos, costoRespectoAProve, memo, 0, 0, cantProves);
             reconstruirVarias(costoRespectoAProve, memo, proves, 0, 0, cantProves);
+        }          
 
         cout << res << endl;
 
         for(int i = 0; i < cantProves; i++)
-            cout << puestos[proves[i]] << " ";
+        cout << puestos[proves[i]] << " ";
         cout << endl;
 
         proves = {};

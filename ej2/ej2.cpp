@@ -27,7 +27,7 @@ long long parciales(vector<long long>& tiempos, vector<long long>& descontentos)
     // Definir una variable para acumular el tiempo transcurrido en la correccion
     long long tiempoAcumulado = 0;
     
-    for (int i = factores.size() - 1; i >= 0; i--){
+    for (int i = factores.size() - 1; i >= 0; i--) {
         // Obtener el indice de aquel que tiene mayor factor
         int indexActual = factores[i].second;
         // Obtener el tiempo necesario para corregir y el descontento por minuto
