@@ -34,8 +34,6 @@ int bridges;
 
 void dfsPuentes(int v) {
 
-    cout << " " << v << ",";
-
     estado[v] = visto;
 
     tiempoVisto[v] = tiempo;
@@ -89,7 +87,7 @@ void probarAristas(int cantLinks) {
         armarListas(cantLinks, i);
         dfsPuentes(0);
 
-        if(bridges == 0)
+        if(bridges != 0)
             linksImportantes.push_back(links[i]);
             
         bridges = 0;
@@ -99,8 +97,6 @@ void probarAristas(int cantLinks) {
         padre = vector<int>(cantBases);
         estado = vector<int>(cantBases);
 
-        linksImportantes = {};
-
         tiempoVisto = vector<int>(cantBases);
 
         minTiempoVisto = vector<int>(cantBases);
@@ -108,6 +104,7 @@ void probarAristas(int cantLinks) {
         tiempo = 1;
 
     }
+
 }
 
 void acomodarEImprimirLinks() {
@@ -131,7 +128,9 @@ int main() {
         cin >> cantBases;
         cin >> cantLinks;
 
-        for(int i = 0; i < cantLinks; i++) {
+        links = {};
+
+        for(int j = 0; j < cantLinks; j++) {
             int base1;
             int base2;
             cin >> base1;
@@ -143,9 +142,24 @@ int main() {
                 links.push_back({base2, base1});
         }
 
+        bridges = 0;
+        linksImportantes = {};
+
+        aristas = vector<vector<int>>(cantBases);
+
+        padre = vector<int>(cantBases);
+        estado = vector<int>(cantBases);
+
+        tiempoVisto = vector<int>(cantBases);
+
+        minTiempoVisto = vector<int>(cantBases);
+
+        tiempo = 1;
+
         probarAristas(cantLinks);
 
         acomodarEImprimirLinks();
+
     }
    
     return 0;
