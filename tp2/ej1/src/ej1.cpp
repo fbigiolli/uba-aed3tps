@@ -4,9 +4,6 @@
 
 using namespace std;
 
-// Algoritmo para determinar Tree Edges, Back Edges y Puentes,
-// a partir del recorrido DFS de un grafo CONEXO y utilizando el algoritmo de Tarjan
-
 int noVisto = 0, visto = 2;
 
 // Aristas del grafo, ya con una ignorada
