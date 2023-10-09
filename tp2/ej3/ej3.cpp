@@ -11,7 +11,6 @@ vector<tuple<int, int, int, int>> aristas; // Nodo 1, nodo2, distancia, nro repe
 int cantEdificios;
 int sumaRepetidores;
 int sumaDistancias;
-// tuple<int,int,int>;
 
 // Modifica la variable global aristas. Recibe por consola los parametros.
 void armarListaAristas(int cantConexiones, vector<vector<int>>& dist, vector<vector<int>>& repetidores) {
@@ -28,7 +27,6 @@ void armarListaAristas(int cantConexiones, vector<vector<int>>& dist, vector<vec
 
         // Arma el vector de aristas
         aristas.push_back(make_tuple(nodo1, nodo2, distancia, numeroRepetidores));
-        // get<0>(adyacencias[nodo1][0]) = 'nodoVecino';
 
         // Arma el vector de repetidores y de distancias
         dist[nodo1][nodo2] = distancia;
@@ -39,15 +37,14 @@ void armarListaAristas(int cantConexiones, vector<vector<int>>& dist, vector<vec
 }
 
 // Dado un numero x, arma la lista de aristas con el ratio correspondiente.
-void armarListaAdyacencias(double x, vector<vector<pair<double, int>>>& aristasConPeso) {
+void armarListaAdyacencias(float x, vector<list<pair<float, int>>>& aristasConPeso) {
     for (int i = 0; i < aristas.size(); i++) {
         tuple <int,int,int,int> aristaActual = aristas[i];
         int nodo1 = get<0>(aristaActual);
         int nodo2 = get<1>(aristaActual);
 
-
-        // Armar el peso  w(e) = c1 - x ⋅ c2
-        double peso = get<2>(aristaActual) - x * get<3>(aristaActual);
+        // Armar el peso  w(e) = c1 - x ⋅ c2  x
+        float peso =  x * get<3>(aristaActual) - get<2>(aristaActual);
 
         // Armar la lista de adyacencias
         aristasConPeso[nodo1].push_back({peso, nodo2});
@@ -56,7 +53,7 @@ void armarListaAdyacencias(double x, vector<vector<pair<double, int>>>& aristasC
 }
 
 // Va a armar una lista de adyacencias en la cual el costo va a ser la distancia entre cada par de nodos
-void armarPrimerListaAdyacencias(vector<vector<pair<double, int>>>& aristasConPeso) {
+void armarPrimerListaAdyacencias(vector<list<pair<float, int>>>& aristasConPeso) {
     for (int i = 0; i < aristas.size(); i++) {
         tuple <int,int,int,int> aristaActual = aristas[i];
         int nodo1 = get<0>(aristaActual);
@@ -71,8 +68,8 @@ void armarPrimerListaAdyacencias(vector<vector<pair<double, int>>>& aristasConPe
 
 
 // Sacado de la practica turno noche, modificado para poder usarlo en nuestra implementacion. Retorna la suma de los repetidores y de las distancias para poder calcular el ratio.
-double prim_m_lg_n(vector<vector<int>>& dist, vector<vector<int>>& repetidores, vector<vector<pair<double, int>>>& aristasConPeso){
-    priority_queue<pair<double, pair<int, int>>> q;
+float prim_m_lg_n(vector<vector<int>>& dist, vector<vector<int>>& repetidores, vector<list<pair<float, int>>>& aristasConPeso){
+    priority_queue<pair<float, pair<int, int>>> q;
     vector<bool> visited(cantEdificios + 1, false);
 
     for(auto [w, v] : aristasConPeso[1]){
@@ -99,7 +96,7 @@ double prim_m_lg_n(vector<vector<int>>& dist, vector<vector<int>>& repetidores, 
     }
 
     // Devuelve el costo del MST
-    return static_cast<double>(sumaDistancias) / static_cast<double>(sumaRepetidores);
+    return static_cast<float>(sumaDistancias) / static_cast<float>(sumaRepetidores);
 }
 
 
@@ -110,7 +107,7 @@ int main() {
 
 
     int cantConexiones;
-    double c1, c2; // Los costos de los MST que vamos a comparar
+    float c1, c2; // Los costos de los MST que vamos a comparar
 
 
     for (int i = 0; i < cantTests; i++) {
@@ -124,7 +121,7 @@ int main() {
 
         vector<vector<int>> dist(cantEdificios + 1, vector<int>(cantEdificios + 1)); // Para un par de nodos tiene el costo del repetidor
         vector<vector<int>> repetidores(cantEdificios + 1, vector<int>(cantEdificios + 1)); // Para un par de nodos tiene la distancia entre ellos
-        vector<vector<pair<double, int>>> aristasConPeso(cantEdificios + 1); // El primer elemento del pair es el costo, el segundo el nodo del que es vecino
+        vector<list<pair<float, int>>> aristasConPeso(cantEdificios + 1); // El primer elemento del pair es el costo, el segundo el nodo del que es vecino
 
         // Armar la lista de aristas, de repetidores y de distancias
         armarListaAristas(cantConexiones, dist, repetidores);
@@ -139,7 +136,7 @@ int main() {
 
         while (true)
         {
-            vector<vector<pair<double, int>>> aristasConPeso(cantEdificios + 1); // Limpiar el vector de adyacencias
+            vector<list<pair<float, int>>> aristasConPeso(cantEdificios + 1); // Limpiar el vector de adyacencias
             armarListaAdyacencias(c1, aristasConPeso); // Actualizo el valor de las aristas con el nuevo costo obtenido.
             c2 = prim_m_lg_n(dist, repetidores, aristasConPeso); // Llamado a prim con la lista de aristas actualizada
 
