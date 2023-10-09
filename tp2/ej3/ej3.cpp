@@ -136,7 +136,14 @@ int main() {
 
         while (true)
         {
-            vector<list<pair<float, int>>> aristasConPeso(cantEdificios + 1); // Limpiar el vector de adyacencias
+            for (auto listaNodo: aristasConPeso)
+            {
+                for (int j = 0; j < listaNodo.size(); j++)
+                {
+                    listaNodo.pop_front();
+                }
+            }
+             // Limpiar el vector de adyacencias
             armarListaAdyacencias(c1, aristasConPeso); // Actualizo el valor de las aristas con el nuevo costo obtenido.
             c2 = prim_m_lg_n(dist, repetidores, aristasConPeso); // Llamado a prim con la lista de aristas actualizada
 
