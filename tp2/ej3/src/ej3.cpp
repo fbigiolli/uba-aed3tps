@@ -105,7 +105,7 @@ int main() {
 
         while (true)
         {
-            // Ordeno las aristas con la formula c1 * r - d y pruebo kruskal hasta que converga.
+            // Ordeno las aristas con la formula c1 * r - d y pruebo kruskal hasta que converja.
             sort(aristas.begin(), aristas.end(), [&](const auto& a, const auto& b)
             {
                 float costA = c1 * get<3>(a) - get<2>(a);
