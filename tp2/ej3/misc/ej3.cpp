@@ -18,17 +18,16 @@ void armarListaAristas(int cantConexiones, vector<vector<int>>& dist, vector<vec
     int nodo2;
     int distancia;
     int numeroRepetidores;
+    aristas.reserve(cantConexiones);
     for (int i = 0; i < cantConexiones; i++) {
-        // Recibe parametros
         cin >> nodo1;
         cin >> nodo2;
         cin >> distancia;
         cin >> numeroRepetidores;
 
-        // Arma el vector de aristas
-        aristas.push_back(make_tuple(nodo1, nodo2, distancia, numeroRepetidores));
 
-        // Arma el vector de repetidores y de distancias
+        aristas.emplace_back(nodo1, nodo2, distancia, numeroRepetidores);
+
         dist[nodo1][nodo2] = distancia;
         dist[nodo2][nodo1] = distancia;
         repetidores[nodo1][nodo2] = numeroRepetidores;
@@ -136,14 +135,10 @@ int main() {
 
         while (true)
         {
-            for (auto listaNodo: aristasConPeso)
-            {
-                for (int j = 0; j < listaNodo.size(); j++)
-                {
-                    listaNodo.pop_front();
-                }
-            }
-             // Limpiar el vector de adyacencias
+            // Limpiar el vector de adyacencias
+            for (auto &lista : aristasConPeso) {
+                lista.clear();}
+
             armarListaAdyacencias(c1, aristasConPeso); // Actualizo el valor de las aristas con el nuevo costo obtenido.
             c2 = prim_m_lg_n(dist, repetidores, aristasConPeso); // Llamado a prim con la lista de aristas actualizada
 
