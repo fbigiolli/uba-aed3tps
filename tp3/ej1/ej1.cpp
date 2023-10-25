@@ -32,7 +32,7 @@ int dijkstra(vector<vector<pair<int, int>>>adj, int s, int t) {
             int nextNode = edge.first;
             int edgeWeight = edge.second;
             int newDist = currentDist + edgeWeight;
-
+            
             int newTunnelsUsed = tunnelsUsed;
             if (edgeWeight == 2) {
                 newTunnelsUsed++;
