@@ -37,35 +37,7 @@ void armarSubfilas(vector<vector<int>>& tablero, vector<list<pair<int,int>>>& su
     }
 }
 
-/*
 
-IDEA
-
-Recibimos la matriz, y cambiamos todos los 1 a -1
-
-// {-1, 0, 0,-1},
-// { 0, 0,-1, 0},
-// {-1, 0,-1, 0},
-// {-1, 0,-1,-1};
-
-Armamos dos matrices más, recorriendo la primera y contando primero la cantidad de subfilas y luego la cantidad de subcolumnas
-Ponemos en cada posición a qué subfila y subcolumna corresponde (que van a ser nodos en el grafo)
-
-// {-1, 1, 1,-1},
-// { 2, 2,-1, 3},
-// {-1, 4,-1, 5},
-// {-1, 6,-1,-1};
-
-// {-1, 8, 9,-1},
-// { 7, 8,-1,10},
-// {-1, 8,-1,10},
-// {-1, 8,-1,-1};
-
-Recorremos la matriz de subfilas, y en cada posición (x, y) distinta a -1, nos fijamos que hay en (x, y) en la matriz de subcolumnas, 
-y agregamos la arista subfilas[x][y] -> subcolumnas[x][y] con capacidad 1 al grafo
-
-
-*/
 
 void armarSubcolumnas(vector<vector<int>>& tablero, vector<list<pair<int,int>>>& subcolumnas){
     for (int col = 0; col < tablero.size(); col++)
