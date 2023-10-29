@@ -9,6 +9,9 @@ using namespace std;
 
 int INF = 1e7;
 
+// Esta función no terminó funcionando (ja) en algún casó especifico del juez
+// Si se ponen todas las aristas en todos los niveles (incluso las que no van a ser usadas), anda joya
+// La dejamos por la parte que arma los tuneles
 void buscarSalidas(int cantSalones, int cantTuneles, vector<int>& salidas, vector<pair<int,int>>& tuneles) {
 
     // A partir del 2do nivel, solo pongo aristas entre salones a partir del 1er salón "llegable" desde el nivel anterior
@@ -55,10 +58,30 @@ void armarAdyacencias(vector<list<pair<int, int>>>& adyacencias, int cantSalones
 
     // Adyacencias[(i - 1) * cantSalones + 1, i * cantSalones + 1] es el iésimo nivel, 1 <= i <= 4
 
-    // Agrego la fuente a los 4 niveles
-    for(int k = 0; k < 4; k++)
-        adyacencias[0].push_back({k * cantSalones + 1, 0});
+    // Agrego la fuente con costo 1
+    adyacencias[0].push_back({1, 1});
 
+    // Por cada nivel, agrego las aristas necesarias
+    for(int i = 0; i <= 3; i++) {
+
+        // Aristas entre salones
+        for(int j = i * cantSalones + 1; j < (i + 1) * cantSalones; j++) 
+            adyacencias[j].push_back({j + 1, 1});
+        
+        // Arista al sumidero
+        adyacencias[(i + 1) * cantSalones].push_back({4 * cantSalones + 1, 0});
+
+        // Tuneles
+        for(int k = 0; k < tuneles.size(); k++) {
+            int desde = tuneles[k].first + i * cantSalones;
+            int hasta = tuneles[k].second + (i + 1) * cantSalones;
+            if(hasta <  4 * cantSalones + 1)
+                adyacencias[desde].push_back({hasta, 2});
+            
+        }
+    }
+
+    /*
     // Por cada nivel, agrego las aristas necesarias a partir de la respectiva salida
     for(int i = 0; i <= 3; i++) {
 
@@ -79,8 +102,8 @@ void armarAdyacencias(vector<list<pair<int, int>>>& adyacencias, int cantSalones
             }
         }
     }
+    
 
-    /*
     // Mostrar adyacencias
     for(int i = 0; i < adyacencias.size(); i++) {
         if(!adyacencias[i].empty()) {
@@ -101,36 +124,12 @@ void armarAdyacencias(vector<list<pair<int, int>>>& adyacencias, int cantSalones
     */    
 }
 
-void dfs(vector<list<pair<int, int>>>& adyacencias, int nodoActual, vector<bool>& visitado, vector<int>& ordenTopologico) {
-    visitado[nodoActual] = true;
-    for (auto u : adyacencias[nodoActual]) {
-        int nodoVecino = u.first;
-        if (!visitado[nodoVecino]) {
-            dfs(adyacencias, nodoVecino, visitado, ordenTopologico);
-        }
-    }
-    ordenTopologico.push_back(nodoActual);
-}
-
-void topologicalSort(vector<list<pair<int, int>>>& adyacencias, vector<int>& ordenTopologico) {
-
-    vector<bool> visitado(adyacencias.size(), false);
-
-    for (int i = 0; i < adyacencias.size(); ++i) {
-        if (!visitado[i]) 
-            dfs(adyacencias, i, visitado, ordenTopologico);
-        
-    }
-
-    reverse(ordenTopologico.begin(), ordenTopologico.end());
-}
-
-void caminoMinimo(const vector<list<pair<int, int>>>& adyacencias, vector<int> ordenTopologico) {
+void caminoMinimo(const vector<list<pair<int, int>>>& adyacencias) {
     
     vector<int> distancias(adyacencias.size(), INF);
     distancias[0] = 0;
 
-    for (int u : ordenTopologico) {
+    for (int u = 0; u < adyacencias.size(); u++) {
         if (distancias[u] != INF) {
             for (const auto& nodoVecino : adyacencias[u]) {
                 int v = nodoVecino.first;
@@ -142,7 +141,7 @@ void caminoMinimo(const vector<list<pair<int, int>>>& adyacencias, vector<int> o
         }
     }
 
-    cout << distancias[distancias.size() - 1] + 1 << endl;
+    cout << distancias[distancias.size() - 1] << endl;
 
 }
 
@@ -170,18 +169,8 @@ int main() {
 
         armarAdyacencias(adyacencias, cantSalones, salidas, tuneles);
 
-        vector<int> ordenTopologico = {};
-        topologicalSort(adyacencias, ordenTopologico);
-
-        /*
-        // Mostrar orden topológico
-        cout << "El orden topologico es: ";
-        for(int i = 0; i < ordenTopologico.size(); i++) 
-            cout << ordenTopologico[i] << ", ";    
-        cout << endl;
-        */
-
-        caminoMinimo(adyacencias, ordenTopologico);
+        // Y como el orden que queda ya es topológico, puedo usar el algoritmo de camino minimo en DAGs
+        caminoMinimo(adyacencias);
     }
 
     return 0;
