@@ -5,9 +5,44 @@
 
 using namespace std;
 
+/*
+
+IDEA
+
+Vamos a separar el tablero en subfilas y subcolumnas, las cuales van a estar delimitadas dependiendo de si hay una casilla rota entre ellas.
+Lo vamos a resolver como un problema de matching en el cual cada subfila puede a lo sumo matchear una subcolumna de modo de no tener mas de una torre en una misma
+subfila/subcolumna. El resultado que buscamos es el matching maximo posible en el grafo bipartito que vamos a armar en el que cada nodo de la primera particion
+representa una subfila, y cada nodo de la segunda particion representa una subcolumna. 
+
+Recibimos la matriz del tablero
+
+// { 1, 0, 0, 1},
+// { 0, 0, 1, 0},
+// { 1, 0, 1, 0},
+// { 1, 0, 1, 1};
+
+Armamos dos matrices más, recorriendo la primera y contando primero la cantidad de subfilas y luego la cantidad de subcolumnas
+Ponemos en cada posición a qué subfila y subcolumna corresponde (que van a ser nodos en el grafo). Ponemos -1 donde no haya ninguna
+
+// {-1, 1, 1,-1},
+// { 2, 2,-1, 3},
+// {-1, 4,-1, 5},
+// {-1, 6,-1,-1};
+
+// {-1, 8, 9,-1},
+// { 7, 8,-1,10},
+// {-1, 8,-1,10},
+// {-1, 8,-1,-1};
+
+Recorremos la matriz de subfilas, y en cada posición (x, y) distinta a -1, nos fijamos que hay en (x, y) en la matriz de subcolumnas, 
+y agregamos la arista subfilas[x][y] -> subcolumnas[x][y] con capacidad 1 al grafo
+
+Agregamos una fuente con arista a todas las subfilas y un sumidero de donde llegan aristas de todas las subcolumnas, todas con capacidad 1
+
+*/
+
 int INF = 1e7;
 int n;
-
 
 int bfs(int s, int t, vector<int>& parent, vector<list<int>>& adyacencias, vector<vector<int>>& capacity) {
     fill(parent.begin(), parent.end(), -1);
@@ -36,6 +71,7 @@ int bfs(int s, int t, vector<int>& parent, vector<list<int>>& adyacencias, vecto
 
 int maxflow(int s, int t, vector<list<int>>& adyacencias, vector<vector<int>>& capacity) {
     int flow = 0;
+    n = adyacencias.size();
     vector<int> parent(n);
     int new_flow;
 
@@ -52,41 +88,6 @@ int maxflow(int s, int t, vector<list<int>>& adyacencias, vector<vector<int>>& c
 
     return flow;
 }
-
-/*
-
-IDEA
-
-Recibimos la matriz del tablero
-
-// { 1, 0, 0, 1},
-// { 0, 0, 1, 0},
-// { 1, 0, 1, 0},
-// { 1, 0, 1, 1};
-
-Armamos dos matrices más, recorriendo la primera y contando primero la cantidad de subfilas y luego la cantidad de subcolumnas
-Ponemos en cada posición a qué subfila y subcolumna corresponde (que van a ser nodos en el grafo). Ponemos -1 donde no haya ninguna
-
-// {-1, 1, 1,-1},
-// { 2, 2,-1, 3},
-// {-1, 4,-1, 5},
-// {-1, 6,-1,-1};
-
-// {-1, 8, 9,-1},
-// { 7, 8,-1,10},
-// {-1, 8,-1,10},
-// {-1, 8,-1,-1};
-
-Recorremos la matriz de subfilas, y en cada posición (x, y) distinta a -1, nos fijamos que hay en (x, y) en la matriz de subcolumnas, 
-y agregamos la arista subfilas[x][y] -> subcolumnas[x][y] con capacidad 1 al grafo
-
-
-*/
-
-// { 1, 0, 0, 1},
-// { 0, 0, 1, 0},
-// { 1, 0, 1, 0},
-// { 1, 0, 1, 1};
 
 pair<int, int> armarMatrices(vector<vector<int>>& tablero, vector<vector<int>>& subfilas, vector<vector<int>>& subcolumnas) {
 
@@ -176,70 +177,40 @@ void armarAdyacencias(vector<vector<int>>& subfilas, vector<vector<int>>& subcol
 }
 
 int main() {   
-    
-    vector<vector<int>>tablero = {{1,0,0,1},
-                                  {0,0,1,0},
-                                  {1,0,1,0},
-                                  {1,0,1,1}};
 
-    int sizeTablero = tablero.size();
+    int cantTests;
+    cin >> cantTests;
 
-    vector<vector<int>> subfilas(tablero.size(), vector<int>(tablero.size(), -1));
-    vector<vector<int>> subcolumnas(tablero.size(), vector<int>(tablero.size(), -1));
+    for (int i = 0; i < cantTests; i++) {
+        int sizeTablero;
+        cin >> sizeTablero;
 
-    // Cantidad de nodos de las subfilas y de las subcolumnas
-    pair<int, int> cantNodos = armarMatrices(tablero, subfilas, subcolumnas);
-    
-    // cout << cantNodos.first << " " << cantNodos.second;
-    
-    int cantSubfilas = cantNodos.first;
-    int cantSubcolumnas = cantNodos.second;
-
-    /*
-    // Mostrar matrices
-    for(int i = 0; i < subfilas.size(); i++) {
-        for(int j = 0; j < subfilas.size(); j++) {
-            if(subfilas[i][j] != -1 && subfilas[i][j] < 10)
-                cout << " " << subfilas[i][j] << " ";
-            else
-                cout << subfilas[i][j] << " ";
+        vector<vector<int>> tablero(sizeTablero,vector<int>(sizeTablero));
+        // Recibir el tablero por consola
+        for (int j = 0; j < sizeTablero; j++) {
+            for (int k = 0; k < sizeTablero; k++)
+                cin >> tablero[j][k];    
         }
-        cout << endl;
+                
+        vector<vector<int>> subfilas(tablero.size(), vector<int>(tablero.size(), -1));
+        vector<vector<int>> subcolumnas(tablero.size(), vector<int>(tablero.size(), -1));
+
+        // Cantidad de nodos de las subfilas y de las subcolumnas
+        pair<int, int> cantNodos = armarMatrices(tablero, subfilas, subcolumnas);
+        
+        int cantSubfilas = cantNodos.first;
+        int cantSubcolumnas = cantNodos.second;
+
+        // Dejo espacio para s y t
+        vector<list<int>> adyacencias(cantSubfilas + cantSubcolumnas + 2);
+        vector<vector<int>> capacidades(cantSubfilas + cantSubcolumnas + 2, vector<int>(cantSubfilas + cantSubcolumnas + 2, 0));
+        armarAdyacencias(subfilas, subcolumnas, adyacencias, cantSubfilas, cantSubcolumnas, capacidades);
+
+        int maxFlujo = maxflow(0, cantNodos.first + cantNodos.second + 1, adyacencias, capacidades);
+        cout << maxFlujo << endl;
     }
-    cout << endl;
     
-    for(int i = 0; i < subcolumnas.size(); i++) {
-        for(int j = 0; j < subcolumnas.size(); j++) {
-            if(subcolumnas[i][j] != -1 && subcolumnas[i][j] < 10)
-                cout << " " << subcolumnas[i][j] << " ";
-            else
-                cout << subcolumnas[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
-    */
-
-    // Dejo espacio para s y t
-    vector<list<int>> adyacencias(cantSubfilas + cantSubcolumnas + 2);
-    vector<vector<int>> capacidades(cantSubfilas + 2, vector<int>(cantSubfilas + cantSubcolumnas + 2, 0));
-    armarAdyacencias(subfilas, subcolumnas, adyacencias, cantSubfilas, cantSubcolumnas, capacidades);
-
-    /*
-    // Mostrar adyacencias
-    for(int i = 0; i < adyacencias.size(); i++) {
-        cout << "Las aristas del nodo " << i << " van a: ";
-        for(auto it = adyacencias[i].begin(); it != adyacencias[i].end(); ++it) {
-            int a = it->first;
-            int b = it->second;
-            cout << a << " ";
-        }
-        cout << endl;
-    }
-    */
-
-    int maxFlujo = maxflow(0, cantNodos.first + cantNodos.second + 1, adyacencias, capacidades);
-    cout << maxFlujo << endl;
+    
 
     return 0;
 }
