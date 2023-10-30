@@ -77,7 +77,8 @@ void reconstruirYPrintearDistancias(vector<vector<int>>& latencias) {
         }
         cout << endl;
     }
-    cout << endl;
+    
+    // cout << endl;
 
 }
 
