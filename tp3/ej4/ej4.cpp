@@ -5,12 +5,16 @@
 
 using namespace std;
 
-int INF = 1e7;
-
+const int INF = 1e7;
 int n;
 
-int bfs(int s, int t, vector<int>& parent, int cantPersonas, vector<vector<int>>& adyacencias, vector<vector<int>>& capacity) {
-    fill(parent.begin(), parent.end(), -1); 
+/* La idea es modelar el problema interpretando el grafo como la cantidad de personas que pueden ir desde s a t llevando una cantidad c de herramientas cada una.
+Para esto, dividimos la capacidad de cada arista por la cant de herramientas, de modo que justamente cada arista del grafo represente la cant de personas que pueden pasar por ella.
+Usamos una busqueda binaria para encontrar el maximo valor posible de herramientas por persona. Cuando converge la busqueda binaria es porque encontramos el resultado final.
+*/
+
+int bfs(int s, int t, vector<int>& parent, vector<vector<int>>& capacity, vector<vector<int>>& adj) {
+    fill(parent.begin(), parent.end(), -1);
     parent[s] = -2;
     queue<pair<int, int>> q;
     q.push({s, INF});
@@ -20,21 +24,12 @@ int bfs(int s, int t, vector<int>& parent, int cantPersonas, vector<vector<int>>
         int flow = q.front().second;
         q.pop();
 
-        for (int i = 0; i < adyacencias[cur].size(); i++){
-            int next = adyacencias[cur][i];
+        for (int next : adj[cur]) {
             if (parent[next] == -1 && capacity[cur][next]) {
                 parent[next] = cur;
                 int new_flow = min(flow, capacity[cur][next]);
-                if (next == t){
-                    int flujoPosible = new_flow - (new_flow % cantPersonas);
-                    if (flujoPosible >= cantPersonas) {
-                        return flujoPosible;
-                    }
-                    if(i == adyacencias[cur].size() - 1)
-                        return 0;
-                    
-                    continue;
-                }
+                if (next == t)
+                    return new_flow;
                 q.push({next, new_flow});
             }
         }
@@ -43,12 +38,12 @@ int bfs(int s, int t, vector<int>& parent, int cantPersonas, vector<vector<int>>
     return 0;
 }
 
-int maxflow(int s, int t, int cantPersonas, int cantEsquinas, vector<vector<int>>& adyacencias, vector<vector<int>>& capacity) {
+int maxflow(int s, int t, vector<vector<int>>& capacity, vector<vector<int>>& adj) {
     int flow = 0;
     vector<int> parent(n);
     int new_flow;
 
-    while (new_flow = bfs(s, t, parent, cantPersonas, adyacencias, capacity)) {
+    while (new_flow = bfs(s, t, parent, capacity, adj)) {
         flow += new_flow;
         int cur = t;
         while (cur != s) {
@@ -81,28 +76,57 @@ int main() {
 
         vector<vector<int>> adyacencias(cantEsquinas);
         vector<vector<int>> capacity(cantEsquinas, vector<int>(cantEsquinas, 0));
+        vector<vector<int>> tempCapacity(cantEsquinas, vector<int>(cantEsquinas, 0));
 
         int desde;
         int hasta;
         int maxHerramientas;
+
+        int minCantHerramientasTotal = INF;
+        int maxCantHerramientasTotal = 0;
 
         for(int j = 0; j < cantCalles; j++) {
             cin >> desde;
             cin >> hasta;
             cin >> maxHerramientas;
 
-            // Corregimos para indexar desde 0
+            maxCantHerramientasTotal = max(maxCantHerramientasTotal, maxHerramientas);
+            minCantHerramientasTotal = min(minCantHerramientasTotal, maxHerramientas);
+            
+            // Corregimos para indexar desde 0  
             desde--;
             hasta--;
-
+ 
             adyacencias[desde].push_back(hasta);
             adyacencias[hasta].push_back(desde);
             capacity[desde][hasta] = maxHerramientas;
         }
 
+        // Hacemos una busqueda binaria para encontrar la mayor cantidad posible de herramientas por persona
+        int left = minCantHerramientasTotal / cantPersonas + 1;
+        int right = maxCantHerramientasTotal;
+        int mid;
+        int flow;
+        while (left <= right) {
+            mid = (left + right) / 2;
 
-        int maxHerramientasLlevables = maxflow(0, cantEsquinas - 1, cantPersonas, cantEsquinas, adyacencias, capacity);
-        cout << maxHerramientasLlevables << endl;
+            // Actualizamos valor de las aristas
+            for (int j = 0; j < capacity.size(); j++) {
+                for (int k = 0; k < capacity.size(); k++) {
+                    tempCapacity[j][k] = capacity[j][k] / mid;
+                }
+            }
+
+            flow = maxflow(0, cantEsquinas - 1, tempCapacity, adyacencias);
+            if (flow >= cantPersonas){
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+
+        cout << min(left,right) * cantPersonas << endl;
+
 
     }
 
