@@ -19,6 +19,6 @@ Modelado con grafos, problemas de camino mínimo, flujo máximo y matching en gr
 - [Resolución](/tp3/)
 
 ## Autores
-- [@fbigiolli](https://github.com/fbigiolli/sistemaVentas)
+- [@fbigiolli](https://github.com/fbigiolli)
 - [@lucaveron](https://github.com/lucaveron)
 - [@mateoschiro8](https://github.com/mateoschiro8)
